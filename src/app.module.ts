@@ -15,7 +15,7 @@ import { Report } from './reports/reports.entity';
     entities: [User, Report], // Tells TypeORM where to find the entities
     synchronize: true, // Automatically creates database tables based on entities (not recommended for production)
   })],
-  controllers: [AppController, ReportsController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
