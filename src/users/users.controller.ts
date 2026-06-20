@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Param, Query, Delete, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Post, Param, Query, Delete, Patch, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UsersService } from './users.service';
@@ -15,7 +15,11 @@ export class UsersController {
     @Get('/:id')
     async findUser(@Param('id') id: string) {
         const userId = parseInt(id, 10); // Convert string to number
-        return this.usersService.findOne(userId);
+        const users = await this.usersService.findOne(userId);
+        if (!users) {
+            throw new NotFoundException('User not found');
+        }
+        return users;
     }
 
     @Get()
@@ -23,18 +27,18 @@ export class UsersController {
         if (!email) {
             throw new Error('Email query parameter is required');
         }
-        return this.usersService.find(email);
+        return await this.usersService.find(email);
     }
 
     @Delete('/:id')
     async deleteUser(@Param('id') id: string) {
         const userId = parseInt(id, 10); // Convert string to number
-        return this.usersService.delete(userId);
+        return await this.usersService.delete(userId);
     }
 
     @Patch('/:id')
     async updateUser(@Param('id') id: string, @Body() reqBody: UpdateUserDto) {
         const userId = parseInt(id, 10); // Convert string to number
-        return this.usersService.update(userId, reqBody);
+        return await this.usersService.update(userId, reqBody);
     }
 }
