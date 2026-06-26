@@ -11,7 +11,7 @@ export class User {
 
   @Column()
   @Exclude() // Exclude password from serialization
-  password!: string;
+  password: string;
 
   @AfterInsert() // Log after user is inserted
   logInsert() {

@@ -4,6 +4,8 @@ import { UpdateUserDto } from './dtos/update-user.dto';
 import { UsersService } from './users.service';
 import { UseInterceptors } from '@nestjs/common';
 import { ClassSerializerInterceptor } from '@nestjs/common';
+import { SerializeInterceptor } from '../interceptors/serialize.interceptors';
+import { UserDto } from './dtos/user.dto';
 
 @Controller('auth')
 export class UsersController {
@@ -14,7 +16,8 @@ export class UsersController {
         return this.usersService.create(reqBody.email, reqBody.password);
     }
 
-    @UseInterceptors(ClassSerializerInterceptor) // Apply interceptor to this route
+    // @UseInterceptors(ClassSerializerInterceptor) // Apply interceptor to this route
+    @UseInterceptors(new SerializeInterceptor(UserDto)) // Apply custom serializer interceptor to this route
     @Get('/:id')
     async findUser(@Param('id') id: string) {
         const userId = parseInt(id, 10); // Convert string to number
