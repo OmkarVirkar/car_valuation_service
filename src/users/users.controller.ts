@@ -8,6 +8,7 @@ import { UsersService } from './users.service';
 import { Serialize } from '../interceptors/serialize.interceptors';
 import { UserDto } from './dtos/user.dto';
 
+// @Serialize(UserDto) // Apply custom serializer interceptor to all routes from this controller
 @Controller('auth')
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
