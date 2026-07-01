@@ -26,6 +26,17 @@ export class AuthService {
 
     async signin(email: string, password: string) {
         // Logic for signing in a user
+        const [user] = await this.userService.find(email);
+        if (!user) {
+            throw new BadRequestException('Invalid email');
+        }
+        // Compare the provided password with the stored hash
+        const [salt, storedHash] = user.password.split('.');
+        const hash = (await scrypt(password, salt, 32)) as Buffer;
+        if (hash.toString('hex') !== storedHash) {
+            throw new BadRequestException('Invalid password');
+        }
+        return user;
     }
 
     signout() {

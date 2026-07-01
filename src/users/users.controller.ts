@@ -20,6 +20,18 @@ export class UsersController {
         return this.authService.signup(reqBody.email, reqBody.password);
     }
 
+    @Serialize(UserDto)
+    @Post('/signin')
+    signin(@Body() reqBody: CreateUserDto) {
+        return this.authService.signin(reqBody.email, reqBody.password);
+    }
+
+    @Serialize(UserDto)
+    @Post('/signout')
+    signout() {
+        return this.authService.signout();
+    }
+
     @UseInterceptors(ClassSerializerInterceptor) // Apply interceptor to this route
     // @UseInterceptors(new SerializeInterceptor(UserDto)) // Apply custom serializer interceptor to this route
     @Serialize(UserDto) // Apply custom serializer interceptor to this route
