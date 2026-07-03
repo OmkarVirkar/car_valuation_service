@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Param, Query, Delete, Patch, NotFoundException } from '@nestjs/common';
+import { Body, Controller, Get, Post, Param, Query, Delete, Patch, NotFoundException, Session } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UsersService } from './users.service';
@@ -9,27 +9,49 @@ import { ClassSerializerInterceptor } from '@nestjs/common';
 import { Serialize } from '../interceptors/serialize.interceptors';
 import { UserDto } from './dtos/user.dto';
 
-// @Serialize(UserDto) // Apply custom serializer interceptor to all routes from this controller
+@Serialize(UserDto) // Apply custom serializer interceptor to all routes from this controller
 @Controller('auth')
 export class UsersController {
     constructor(private readonly usersService: UsersService, private readonly authService: AuthService) {}
 
-    @Serialize(UserDto) // Apply custom serializer interceptor to this route
-    @Post('/signup')
-    signup(@Body() reqBody: CreateUserDto) {
-        return this.authService.signup(reqBody.email, reqBody.password);
-    }
-
-    @Serialize(UserDto)
-    @Post('/signin')
-    signin(@Body() reqBody: CreateUserDto) {
-        return this.authService.signin(reqBody.email, reqBody.password);
+    @Get('/whoami')
+    whoAmI(@Session() session: any) {
+        return this.usersService.findOne(session.userId);
     }
 
     @Serialize(UserDto)
     @Post('/signout')
-    signout() {
-        return this.authService.signout();
+    signout(@Session() session: any) {
+        session.userId = null;
+        return;
+    }
+
+    @Get('/colors/:color')
+    setColor(@Param('color') color: string, @Session() session: any) {
+        session.color = color;
+        return session.color;
+    }
+
+    @Get('/colors')
+    getColor(@Session() session: any) {
+        return session.color;
+    }
+
+    @Serialize(UserDto) // Apply custom serializer interceptor to this route
+    @Post('/signup')
+    async signup(@Body() reqBody: CreateUserDto, @Session() session: any) {
+        const user = await this.authService.signup(reqBody.email, reqBody.password);
+        session.userId = user.id; // Store the user ID in the session
+        return user;
+
+    }
+
+    @Serialize(UserDto)
+    @Post('/signin')
+    async signin(@Body() reqBody: CreateUserDto, @Session() session: any) {
+        const user = await this.authService.signin(reqBody.email, reqBody.password);
+        session.userId = user.id; // Store the user ID in the session
+        return user;
     }
 
     @UseInterceptors(ClassSerializerInterceptor) // Apply interceptor to this route

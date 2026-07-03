@@ -38,8 +38,4 @@ export class AuthService {
         }
         return user;
     }
-
-    signout() {
-        // Logic for signing out a user
-    }x
 }
