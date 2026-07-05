@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Param, Query, Delete, Patch, NotFoundException, Session } from '@nestjs/common';
+import { Body, Controller, Get, Post, Param, Query, Delete, Patch, NotFoundException, Session, UseGuards } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UsersService } from './users.service';
@@ -11,6 +11,7 @@ import { UserDto } from './dtos/user.dto';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { CurrentUserInterceptor } from './interceptors/current-user.interceptor';
 import { User } from './users.entity';
+import { AuthGuard } from 'src/guards/auth.guard';
 
 @Serialize(UserDto) // Apply custom serializer interceptor to all routes from this controller
 // @UseInterceptors(CurrentUserInterceptor) // Apply the CurrentUserInterceptor to all routes from this controller
@@ -19,6 +20,7 @@ export class UsersController {
     constructor(private readonly usersService: UsersService, private readonly authService: AuthService) {}
 
     @Get('/whoami')
+    @UseGuards(AuthGuard) // Apply the AuthGuard to this route
     whoAmI(@CurrentUser() currentUser: User) {
         return currentUser;
     }
