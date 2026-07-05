@@ -8,15 +8,19 @@ import { ClassSerializerInterceptor } from '@nestjs/common';
 // import { SerializeInterceptor } from '../interceptors/serialize.interceptors';
 import { Serialize } from '../interceptors/serialize.interceptors';
 import { UserDto } from './dtos/user.dto';
+import { CurrentUser } from './decorators/current-user.decorator';
+import { CurrentUserInterceptor } from './interceptors/current-user.interceptor';
+import { User } from './users.entity';
 
 @Serialize(UserDto) // Apply custom serializer interceptor to all routes from this controller
+// @UseInterceptors(CurrentUserInterceptor) // Apply the CurrentUserInterceptor to all routes from this controller
 @Controller('auth')
 export class UsersController {
     constructor(private readonly usersService: UsersService, private readonly authService: AuthService) {}
 
     @Get('/whoami')
-    whoAmI(@Session() session: any) {
-        return this.usersService.findOne(session.userId);
+    whoAmI(@CurrentUser() currentUser: User) {
+        return currentUser;
     }
 
     @Serialize(UserDto)
