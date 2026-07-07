@@ -4,6 +4,8 @@ import { CreateReportDto } from './dtos/create-report.dto';
 import {AuthGuard} from "../guards/auth.guard";
 import {CurrentUser} from "../users/decorators/current-user.decorator";
 import {User} from "../users/users.entity";
+import { Serialize } from 'src/interceptors/serialize.interceptors';
+import { ReportDto } from './dtos/report.dto';
 
 @Controller('reports')
 export class ReportsController {
@@ -11,6 +13,7 @@ export class ReportsController {
 
     @Post('/createReport')
     @UseGuards(AuthGuard)
+    @Serialize(ReportDto)
     async createReport(@Body() reportBody: CreateReportDto, @CurrentUser() user: User) {
         return await this.reportsService.createReport(reportBody, user);
     }
